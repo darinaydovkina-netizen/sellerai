@@ -104,6 +104,12 @@ a{color:inherit;text-decoration:none}
 /* Results Accordion */
 .results{display:none;margin-top:1.5rem}
 .results.active{display:block}
+.gen-welcome{text-align:center;margin-top:2.5rem;padding:2rem;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)}
+.gen-welcome-icon{font-size:2.5rem;margin-bottom:0.5rem}
+.gen-welcome h2{font-size:1.2rem;font-weight:600;color:var(--text);margin-bottom:0.5rem}
+.gen-welcome-text{font-size:0.85rem;color:var(--text2);margin-bottom:1.25rem;max-width:400px;margin-left:auto;margin-right:auto}
+.gen-examples{padding:0.7rem 1rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.82rem;color:var(--text2);cursor:pointer;transition:all 0.2s;margin-bottom:0.5rem;text-align:left}
+.gen-examples:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,113,227,0.04)}
 .accordion-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:0.5rem;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
 .accordion-header{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;cursor:pointer;user-select:none;transition:background 0.2s}
 .accordion-header:hover{background:var(--surface)}
@@ -247,6 +253,7 @@ a{color:inherit;text-decoration:none}
     <div class="sidebar-footer">
       <div class="sidebar-gens">Остаток генераций: <span id="gen-count">0</span></div>
       <button class="sidebar-logout" id="logout-btn">🚪 Выйти</button>
+      <a href="index.html" class="sidebar-back" style="display:block;text-align:center;margin-top:0.5rem;padding:0.5rem;font-size:0.8rem;color:var(--text3);text-decoration:none;border-radius:var(--radius-sm);transition:all 0.2s;" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='transparent'">← На главную</a>
     </div>
   </aside>
 
@@ -300,6 +307,22 @@ a{color:inherit;text-decoration:none}
         </div>
 
         <button class="gen-submit" id="gen-submit">Сгенерировать</button>
+
+        <!-- Welcome / Empty state -->
+        <div class="gen-welcome" id="gen-welcome">
+          <div class="gen-welcome-icon">✨</div>
+          <h2>Добро пожаловать в SellerAI!</h2>
+          <p class="gen-welcome-text">Вставь ссылку на товар с Wildberries, Ozon или Яндекс Маркет — и AI сделает всё за тебя.</p>
+          <div class="gen-examples" onclick="document.getElementById('gen-input').value=this.dataset.example; document.getElementById('gen-input').focus()" data-example="https://www.wildberries.ru/catalog/12345678/detail.aspx">
+            📦 WB: https://www.wildberries.ru/catalog/...
+          </div>
+          <div class="gen-examples" onclick="document.getElementById('gen-input').value=this.dataset.example; document.getElementById('gen-input').focus()" data-example="https://www.ozon.ru/product/tovar-123456789/">
+            🔵 Ozon: https://www.ozon.ru/product/...
+          </div>
+          <div class="gen-examples" onclick="document.getElementById('gen-input').value=this.dataset.example; document.getElementById('gen-input').focus()" data-example="Приставка Smart TV Wi-Fi">
+            🟡 Или просто название: "Приставка Smart TV Wi-Fi"
+          </div>
+        </div>
 
         <!-- Loader -->
         <div class="loader" id="gen-loader">
@@ -740,6 +763,8 @@ async function handleGenerate() {
   genLoader.classList.add('active');
   genResults.classList.remove('active');
   genResults.innerHTML = '';
+  const welcome = document.getElementById('gen-welcome');
+  if (welcome) welcome.style.display = 'none';
 
   try {
     const data = await apiRequest('POST', '/generate', { product, marketplace, tools });
