@@ -27,8 +27,11 @@ FIELDS_MAP = {
     "description": "description",
     "keywords": "keywords",
     "reviews": "review_positive, review_negative",
+    "review_answers": "review_positive, review_negative",
     "photos": "photo_ideas",
+    "photo_ideas": "photo_ideas",
     "competitors": "competitor_analysis",
+    "competitor_analysis": "competitor_analysis",
     "ad": "ad_text",
 }
 
