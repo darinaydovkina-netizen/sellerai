@@ -145,11 +145,14 @@ a{color:inherit;text-decoration:none}
 .gen-examples{padding:0.7rem 1rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.82rem;color:var(--text2);cursor:pointer;transition:all 0.2s;margin-bottom:0.5rem;text-align:left}
 .gen-examples:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,113,227,0.04)}
 /* Product Card */
-.product-card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);margin-bottom:1.5rem}
+.product-card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);margin-bottom:1.5rem;max-width:420px;margin-left:auto;margin-right:auto}
+.product-card-img{width:100%;aspect-ratio:1/1;background:linear-gradient(135deg,#f5f7ff 0%,#e8edf5 50%,#f0f2f8 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.product-card-img::before{content:'';position:absolute;top:-40%;left:-20%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,rgba(0,113,227,0.04) 0%,transparent 50%),radial-gradient(circle at 70% 60%,rgba(255,159,10,0.03) 0%,transparent 50%);pointer-events:none}
+.product-card-img .pc-img-icon{font-size:4.5rem;opacity:0.35;position:relative;z-index:1;filter:grayscale(0.3)}
 .product-card-header{background:linear-gradient(135deg,#0071e3,#005bbf);color:#fff;padding:1.25rem 1.5rem;position:relative;overflow:hidden}
 .product-card-header::after{content:'';position:absolute;top:-40px;right:-20px;width:120px;height:120px;background:rgba(255,255,255,0.06);border-radius:50%}
 .product-card-header .pc-badge{display:inline-block;background:rgba(255,255,255,0.15);padding:0.2rem 0.7rem;border-radius:20px;font-size:0.7rem;font-weight:500;margin-bottom:0.5rem;letter-spacing:0.02em}
-.product-card-header .pc-title{font-size:1.3rem;font-weight:700;margin:0;line-height:1.3;letter-spacing:-0.01em}
+.product-card-header .pc-title{font-size:1.15rem;font-weight:700;margin:0;line-height:1.3;letter-spacing:-0.01em}
 .product-card-body{padding:1.5rem}
 .pc-field{margin-bottom:1.25rem}
 .pc-field:last-child{margin-bottom:0}
@@ -891,6 +894,17 @@ async function handleGenerate() {
 
     state.generationResult = data;
     renderResults(data, tools);
+
+    const allTools = ['title','description','keywords','review_answers','photo_ideas','competitor_analysis'];
+    if (tools.length >= 4) {
+      apiRequest('POST', '/product/image', { url: product }).then(imgData => {
+        if (imgData?.image_url) {
+          const imgArea = document.querySelector('.product-card-img');
+          if (imgArea) imgArea.innerHTML = `<img src="${imgData.image_url}" alt="Фото товара" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" crossorigin="anonymous">`;
+        }
+      }).catch(() => {});
+    }
+
     showToast('Генерация завершена', 'success');
     loadHistory();
   } catch (err) {
@@ -947,6 +961,9 @@ function renderResults(data, tools) {
     const keywordTags = keywords ? keywords.split(',').map(k => `<span class="pc-tag">${k.trim()}</span>`).join('') : '';
 
     genResults.innerHTML = `<div class="product-card" id="product-card-img">
+      <div class="product-card-img">
+        <span class="pc-img-icon">📦</span>
+      </div>
       <div class="product-card-header">
         <div class="pc-badge">✨ SellerAI</div>
         <h2 class="pc-title">${title || 'Карточка товара'}</h2>
@@ -958,8 +975,8 @@ function renderResults(data, tools) {
           <div class="pc-tags">${keywordTags}</div>
         </div>` : ''}
         <div class="pc-separator"></div>
-        ${renderField('Анализ конкурентов', '📊', competitorAnalysis)}
         ${renderField('Идеи для фото', '📸', photoIdeas)}
+        ${renderField('Анализ конкурентов', '📊', competitorAnalysis)}
         ${renderField('Ответы на отзывы', '💬', reviewAnswers)}
       </div>
       <div class="pc-footer">
