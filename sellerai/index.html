@@ -26,6 +26,7 @@
       --bg-primary: #ffffff;
       --bg-secondary: #f5f5f7;
       --bg-tertiary: #e8e8ed;
+      --card-bg: #f5f5f7;
       --text-primary: #1d1d1f;
       --text-secondary: #86868b;
       --text-tertiary: #aeaeb2;
@@ -48,7 +49,7 @@
 
     .eyebrow {
       font-size: 0.8rem; font-weight: 600; color: var(--accent-orange);
-      letter-spacing: 0.03em; text-transform: uppercase; margin-bottom: 0.75rem;
+      letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.75rem;
     }
     .section-title {
       font-size: 1.3rem; font-weight: 700; color: var(--text-primary);
@@ -178,34 +179,13 @@
 
     .pricing { padding: 1.5rem; border-top: 1px solid var(--border-subtle); }
     .pricing-header { text-align: center; margin-bottom: 1.5rem; }
-    .pricing-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; max-width: 600px; margin: 0 auto; }
-    .pricing-plan {
-      flex: 1; min-width: 160px; max-width: 200px;
-      background: var(--bg-secondary); border-radius: var(--radius-card);
-      padding: 1.25rem; text-align: center; position: relative;
-    }
-    .pricing-plan.highlight {
-      background: white; border: 2px solid var(--accent-orange);
-      transform: translateY(-4px);
-    }
-    .pricing-badge {
-      position: absolute; top: -8px; right: 12px;
-      background: var(--accent-orange); color: white;
-      font-size: 0.55rem; padding: 2px 8px; border-radius: var(--radius-pill);
-      font-weight: 600;
-    }
-    .pricing-name { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
-    .pricing-price { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0.25rem 0; }
-    .pricing-period { font-size: 0.65rem; color: var(--text-secondary); }
-    .pricing-features { font-size: 0.75rem; color: var(--text-secondary); margin: 0.75rem 0; line-height: 1.7; }
-    .pricing-btn {
-      display: block; border: 1px solid var(--border-light);
-      border-radius: var(--radius-pill); padding: 7px; text-align: center;
-      font-size: 0.75rem; color: var(--text-secondary);
-    }
-    .pricing-btn.highlight {
-      background: var(--accent-blue); color: white; border: none;
-    }
+    .pricing-list { max-width: 400px; margin: 0 auto; }
+    .pricing-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-subtle); }
+    .pricing-item:last-child { border-bottom: none; }
+    .pricing-item-name { font-size: 0.9rem; color: var(--text-primary); }
+    .pricing-item-price { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+    .pricing-item-desc { font-size: 0.75rem; color: var(--text-secondary); }
+    .pricing-item.highlight .pricing-item-name { color: var(--accent-orange); font-weight: 600; }
 
     .cta-section { text-align: center; padding: 2.5rem 1.5rem; }
     .cta-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 0.5rem; }
@@ -228,9 +208,6 @@
     .calc-result-value { font-size: 2rem; font-weight: 700; color: var(--accent-blue); letter-spacing: -0.02em; }
     @media (max-width: 768px) {
       .hero-title { font-size: 2.5rem; }
-      .pricing-row { flex-direction: column; align-items: center; }
-      .pricing-plan { max-width: 280px; width: 100%; }
-      .pricing-plan.highlight { transform: none; }
     }
     @media (max-width: 480px) {
       .hero { padding: 2rem 1rem 0; }
@@ -342,36 +319,35 @@
   </div>
 </section>
 
-<section class="pricing" id="pricing" aria-label="Тарифы">
-  <div class="pricing-header">
-    <p class="eyebrow">ТАРИФЫ</p>
-    <h2 class="section-title">Выберите план</h2>
-  </div>
-  <div class="pricing-row">
-    <div class="pricing-plan reveal">
-      <div class="pricing-name">Starter</div>
-      <div class="pricing-price">499</div>
-      <div class="pricing-period">₽/мес</div>
-      <div class="pricing-features">50 генераций<br>1 маркетплейс</div>
-      <div class="pricing-btn">Выбрать</div>
+  <section class="pricing" id="pricing" aria-label="Тарифы">
+    <div class="pricing-header">
+      <p class="eyebrow">ТАРИФЫ</p>
+      <h2 class="section-title">Выберите план</h2>
     </div>
-    <div class="pricing-plan highlight reveal">
-      <div class="pricing-badge">ТОП</div>
-      <div class="pricing-name">Business</div>
-      <div class="pricing-price">999</div>
-      <div class="pricing-period">₽/мес</div>
-      <div class="pricing-features">200 генераций<br>Все маркетплейсы</div>
-      <div class="pricing-btn highlight">Выбрать</div>
+    <div class="pricing-list">
+      <div class="pricing-item reveal">
+        <div>
+          <div class="pricing-item-name">Starter</div>
+          <div class="pricing-item-desc">50 генераций · 1 маркетплейс</div>
+        </div>
+        <div class="pricing-item-price">499 ₽/мес</div>
+      </div>
+      <div class="pricing-item highlight reveal">
+        <div>
+          <div class="pricing-item-name">Business</div>
+          <div class="pricing-item-desc">200 генераций · Все маркетплейсы</div>
+        </div>
+        <div class="pricing-item-price" style="color:var(--accent-orange);">999 ₽/мес</div>
+      </div>
+      <div class="pricing-item reveal">
+        <div>
+          <div class="pricing-item-name">Pro</div>
+          <div class="pricing-item-desc">Безлимит · API доступ</div>
+        </div>
+        <div class="pricing-item-price">1 990 ₽/мес</div>
+      </div>
     </div>
-    <div class="pricing-plan reveal">
-      <div class="pricing-name">Pro</div>
-      <div class="pricing-price">1 990</div>
-      <div class="pricing-period">₽/мес</div>
-      <div class="pricing-features">Безлимит<br>API доступ</div>
-      <div class="pricing-btn">Выбрать</div>
-    </div>
-  </div>
-</section>
+  </section>
 
 <section class="cta-section" id="cta" aria-label="Начать бесплатно">
   <h2 class="cta-title">Начните бесплатно</h2>
@@ -463,7 +439,12 @@
         var manualHours = Math.round(products * 20 / 60);
         var aiHours = Math.round(products * 3 / 3600);
         var saved = manualHours - aiHours;
-        calcResult.textContent = '~' + saved + ' часов';
+        // Apply tariff multiplier: Business (999) = 1x, Starter (499) = 0.7x, Pro (1990) = 1.3x
+        var multiplier = 1;
+        if (currentPlan === 499) multiplier = 0.7;
+        else if (currentPlan === 1990) multiplier = 1.3;
+        var adjusted = Math.round(saved * multiplier);
+        calcResult.textContent = '~' + adjusted + ' часов';
       }
     });
   </script>
