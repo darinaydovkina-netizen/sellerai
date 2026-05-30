@@ -2,7 +2,8 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    anthropic_api_key: str = ""
+    yandex_api_key: str = ""
+    yandex_folder_id: str = ""
     jwt_secret: str = "change-me"
     database_url: str = "sqlite+aiosqlite:///./sellerai.db"
 
