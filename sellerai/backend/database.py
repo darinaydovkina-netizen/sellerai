@@ -54,6 +54,7 @@ async def init_db():
         result = await session.execute(select(Tariff))
         if not result.scalars().first():
             session.add_all([
+                Tariff(name="free", generations_per_month=5, price=0),
                 Tariff(name="starter", generations_per_month=50, price=499),
                 Tariff(name="business", generations_per_month=200, price=999),
                 Tariff(name="pro", generations_per_month=-1, price=1990),

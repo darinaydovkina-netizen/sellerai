@@ -88,7 +88,8 @@ async def register(req: RegisterRequest):
 
         hashed = hash_password(req.password)
 
-        tariff = await session.execute(select(Tariff).where(Tariff.name == "starter"))
+        tariff = await session.execute(select(Tariff).where(Tariff.name == "free"))
+
         starter = tariff.scalar_one()
 
         user = User(email=req.email, hashed_password=hashed, tariff_id=starter.id)
@@ -235,8 +236,10 @@ async def _oauth_login(code: str, state: str, provider: str, request: Request):
 
         if not user:
             random_hash = hash_password(secrets.token_urlsafe(16))
-            tariff = await session.execute(select(Tariff).where(Tariff.name == "starter"))
+            tariff = await session.execute(select(Tariff).where(Tariff.name == "free"))
+
             starter = tariff.scalar_one()
+
             user = User(email=user_info["email"], hashed_password=random_hash, tariff_id=starter.id)
             session.add(user)
             await session.commit()

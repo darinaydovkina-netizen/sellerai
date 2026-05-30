@@ -612,7 +612,7 @@ async function loadDashboard() {
     genCount.textContent = genRemaining;
 
     profileEmail.textContent = me.email || '—';
-    const tariffNames = { starter: 'Starter', business: 'Business', pro: 'Pro' };
+    const tariffNames = { free: 'Free', starter: 'Starter', business: 'Business', pro: 'Pro' };
     const tariffName = me.tariff?.name || me.tariff || '—';
     profileTariff.textContent = tariffNames[tariffName] || tariffName;
     const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
@@ -639,7 +639,7 @@ async function loadProfile() {
     const limit = me.generations_limit || 0;
     showScreen('profile');
     profileEmail.textContent = me.email || '—';
-    const tariffNames = { starter: 'Starter', business: 'Business', pro: 'Pro' };
+    const tariffNames = { free: 'Free', starter: 'Starter', business: 'Business', pro: 'Pro' };
     const tariffName = me.tariff?.name || me.tariff || '—';
     profileTariff.textContent = tariffNames[tariffName] || tariffName;
     const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
