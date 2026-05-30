@@ -126,8 +126,8 @@ def _clean_oauth_states():
         _oauth_states.clear()
 
 
-def _get_oauth_redirect_uri(request: Request) -> str:
-    return str(request.base_url).rstrip("/") + "/auth/oauth/callback"
+def _get_oauth_redirect_uri(request: Request, provider: str) -> str:
+    return str(request.base_url).rstrip("/") + f"/auth/oauth/callback/{provider}"
 
 
 PROVIDER_CONFIGS = {
@@ -222,7 +222,7 @@ async def _oauth_login(code: str, state: str, provider: str, request: Request):
         raise HTTPException(status_code=400, detail="Invalid state parameter")
 
     cfg, client_id = _get_provider_or_404(provider)
-    redirect_uri = _get_oauth_redirect_uri(request)
+    redirect_uri = _get_oauth_redirect_uri(request, provider)
     token_data = await _exchange_code(provider, cfg, client_id, code, redirect_uri)
     user_info = await _fetch_user_info(provider, cfg, token_data)
 
@@ -252,7 +252,7 @@ async def oauth_url_get(provider: str, request: Request):
     _oauth_states[state] = provider
 
     cfg, client_id = _get_provider_or_404(provider)
-    redirect_uri = _get_oauth_redirect_uri(request)
+    redirect_uri = _get_oauth_redirect_uri(request, provider)
 
     params = {
         "client_id": client_id,
@@ -272,7 +272,7 @@ async def oauth_url_post(req: OAuthUrlRequest, request: Request):
     _oauth_states[state] = req.provider
 
     cfg, client_id = _get_provider_or_404(req.provider)
-    redirect_uri = _get_oauth_redirect_uri(request)
+    redirect_uri = _get_oauth_redirect_uri(request, req.provider)
 
     params = {
         "client_id": client_id,
