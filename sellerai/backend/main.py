@@ -377,27 +377,6 @@ async def get_history(user=Depends(get_current_user)):
     ]
 
 
-@app.post("/product/image", status_code=200)
-async def product_image(req: Request):
-    body = await req.json()
-    url = body.get("url", "")
-    if not url:
-        raise HTTPException(status_code=400, detail="URL обязателен")
-    try:
-        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
-            resp = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
-            html = resp.text
-            import re
-            m = re.search(r'<meta\s+property="og:image"\s+content="([^"]+)"', html, re.IGNORECASE)
-            if not m:
-                m = re.search(r'<meta\s+name="og:image"\s+content="([^"]+)"', html, re.IGNORECASE)
-            if m:
-                return {"image_url": m.group(1)}
-        return {"image_url": None}
-    except Exception:
-        return {"image_url": None}
-
-
 @app.post("/upgrade", status_code=200)
 async def upgrade_to_pro(user=Depends(get_current_user)):
     if user.email != "darinaydovkina@gmail.com":
