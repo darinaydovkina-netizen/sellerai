@@ -26,10 +26,8 @@
       --bg-primary: #ffffff;
       --bg-secondary: #f5f5f7;
       --bg-tertiary: #e8e8ed;
-      --card-bg: #f5f5f7;
       --text-primary: #1d1d1f;
       --text-secondary: #86868b;
-      --text-tertiary: #aeaeb2;
       --accent-blue: #0071e3;
       --accent-blue-hover: #0077ed;
       --accent-orange: #FF4D00;
@@ -203,6 +201,7 @@
     .calc-value { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
     .calc-slider { width: 100%; margin: 0.5rem 0 1rem; -webkit-appearance: none; appearance: none; height: 4px; background: #d1d1d6; border-radius: 2px; outline: none; }
     .calc-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-blue); cursor: pointer; }
+    .calc-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--accent-blue); cursor: pointer; border: none; }
     .calc-result { text-align: center; padding-top: 1rem; border-top: 1px solid var(--border-light); margin-top: 1rem; }
     .calc-result-label { font-size: 0.8rem; color: var(--text-secondary); }
     .calc-result-value { font-size: 2rem; font-weight: 700; color: var(--accent-blue); letter-spacing: -0.02em; }
@@ -268,7 +267,6 @@
         <div class="product-tile">
           <div class="product-tile-label">ОПИСАНИЕ</div>
           <div class="product-tile-value">Готово ✓ 1 240 символов</div>
-          <div class="product-tile-ctr"></div>
         </div>
       </div>
     </div>
@@ -436,15 +434,19 @@
 
       function updateCalc() {
         var products = parseInt(calcSlider.value);
-        var manualHours = Math.round(products * 20 / 60);
-        var aiHours = Math.round(products * 3 / 3600);
-        var saved = manualHours - aiHours;
-        // Apply tariff multiplier: Business (999) = 1x, Starter (499) = 0.7x, Pro (1990) = 1.3x
+        var manualMinutes = products * 20; // 20 min per product manually
+        var aiMinutes = products * 0.5;    // 30 seconds per product with AI
+        var savedMinutes = manualMinutes - aiMinutes;
+        // Apply tariff multiplier
         var multiplier = 1;
         if (currentPlan === 499) multiplier = 0.7;
         else if (currentPlan === 1990) multiplier = 1.3;
-        var adjusted = Math.round(saved * multiplier);
-        calcResult.textContent = '~' + adjusted + ' часов';
+        var adjustedMinutes = Math.round(savedMinutes * multiplier);
+        if (adjustedMinutes >= 60) {
+          calcResult.textContent = '~' + Math.round(adjustedMinutes / 60) + ' ч';
+        } else {
+          calcResult.textContent = '~' + adjustedMinutes + ' мин';
+        }
       }
     });
   </script>
