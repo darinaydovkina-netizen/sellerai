@@ -97,7 +97,7 @@ async def register(req: RegisterRequest):
         await session.commit()
         await session.refresh(user)
 
-    return {"id": user.id, "email": user.email}
+    return {"id": user.id, "email": user.email, "access_token": create_access_token({"sub": user.email}), "token_type": "bearer"}
 
 
 @app.post("/auth/login", response_model=TokenResponse)
