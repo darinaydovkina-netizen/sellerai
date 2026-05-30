@@ -613,13 +613,14 @@ async function loadDashboard() {
 
     profileEmail.textContent = me.email || '—';
     const tariffNames = { starter: 'Starter', business: 'Business', pro: 'Pro' };
-    profileTariff.textContent = tariffNames[me.tariff] || me.tariff || '—';
+    const tariffName = me.tariff?.name || me.tariff || '—';
+    profileTariff.textContent = tariffNames[tariffName] || tariffName;
     const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
     profileProgress.style.width = pct + '%';
     profileUsed.textContent = used;
     profileLimit.textContent = limit;
 
-    document.querySelectorAll('.tariff-card').forEach(c => c.classList.toggle('active', c.dataset.tariff === me.tariff));
+    document.querySelectorAll('.tariff-card').forEach(c => c.classList.toggle('active', c.dataset.tariff === tariffName));
 
     showScreen('generator');
     loadHistory();
@@ -639,12 +640,13 @@ async function loadProfile() {
     showScreen('profile');
     profileEmail.textContent = me.email || '—';
     const tariffNames = { starter: 'Starter', business: 'Business', pro: 'Pro' };
-    profileTariff.textContent = tariffNames[me.tariff] || me.tariff || '—';
+    const tariffName = me.tariff?.name || me.tariff || '—';
+    profileTariff.textContent = tariffNames[tariffName] || tariffName;
     const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
     profileProgress.style.width = pct + '%';
     profileUsed.textContent = used;
     profileLimit.textContent = limit;
-    document.querySelectorAll('.tariff-card').forEach(c => c.classList.toggle('active', c.dataset.tariff === me.tariff));
+    document.querySelectorAll('.tariff-card').forEach(c => c.classList.toggle('active', c.dataset.tariff === tariffName));
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -914,7 +916,8 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') modal
 document.querySelectorAll('.tariff-card').forEach(card => {
   card.addEventListener('click', function() {
     const tariff = this.dataset.tariff;
-    if (tariff && tariff !== (state.user?.tariff || '')) changeTariff(tariff);
+    const currentTariff = state.user?.tariff?.name || state.user?.tariff || '';
+    if (tariff && tariff !== currentTariff) changeTariff(tariff);
   });
 });
 
