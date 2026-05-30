@@ -504,7 +504,7 @@ async function apiRequest(method, path, body) {
 
   const controller = new AbortController();
   opts.signal = controller.signal;
-  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  const timeoutId = setTimeout(() => controller.abort(), 90000);
 
   try {
     const res = await fetch(API_BASE + path, opts);
@@ -924,17 +924,17 @@ document.querySelectorAll('.tariff-card').forEach(card => {
 /* ── Init ── */
 async function init() {
   if (state.token) {
-    try {
-      await loadDashboard();
-      return;
-    } catch (err) {
-      if (err.message.includes('401') || err.message.includes('истекла')) {
-        // Already handled in apiRequest
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        await loadDashboard();
+        return;
+      } catch (err) {
+        if (err.message.includes('401') || err.message.includes('истекла')) break;
+        if (attempt < 2) await new Promise(r => setTimeout(r, 3000));
       }
     }
   }
 
-  // Show auth if no token or failed
   if (!state.token) {
     screenAuth.style.display = 'flex';
     screenDashboard.style.display = 'none';
