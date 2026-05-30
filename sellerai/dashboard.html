@@ -144,15 +144,34 @@ a{color:inherit;text-decoration:none}
 .gen-welcome-text{font-size:0.85rem;color:var(--text2);margin-bottom:1.25rem;max-width:400px;margin-left:auto;margin-right:auto}
 .gen-examples{padding:0.7rem 1rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.82rem;color:var(--text2);cursor:pointer;transition:all 0.2s;margin-bottom:0.5rem;text-align:left}
 .gen-examples:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,113,227,0.04)}
-.accordion-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:0.5rem;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
-.accordion-header{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;cursor:pointer;user-select:none;transition:background 0.2s}
-.accordion-header:hover{background:var(--surface)}
-.accordion-header .label{font-weight:600;font-size:0.9rem;color:var(--text)}
-.accordion-header .arrow{color:var(--text3);font-size:0.75rem;transition:transform 0.2s}
+/* Product Card */
+.product-card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);margin-bottom:1.5rem}
+.product-card-header{background:linear-gradient(135deg,#0071e3,#005bbf);color:#fff;padding:1.25rem 1.5rem;position:relative;overflow:hidden}
+.product-card-header::after{content:'';position:absolute;top:-40px;right:-20px;width:120px;height:120px;background:rgba(255,255,255,0.06);border-radius:50%}
+.product-card-header .pc-badge{display:inline-block;background:rgba(255,255,255,0.15);padding:0.2rem 0.7rem;border-radius:20px;font-size:0.7rem;font-weight:500;margin-bottom:0.5rem;letter-spacing:0.02em}
+.product-card-header .pc-title{font-size:1.3rem;font-weight:700;margin:0;line-height:1.3;letter-spacing:-0.01em}
+.product-card-body{padding:1.5rem}
+.pc-field{margin-bottom:1.25rem}
+.pc-field:last-child{margin-bottom:0}
+.pc-field-label{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);margin-bottom:0.35rem;display:flex;align-items:center;gap:0.35rem}
+.pc-field-value{font-size:0.92rem;color:var(--text);line-height:1.6}
+.pc-tags{display:flex;flex-wrap:wrap;gap:0.4rem}
+.pc-tag{padding:0.25rem 0.65rem;background:#f0f4ff;color:#0071e3;border-radius:6px;font-size:0.8rem;font-weight:500}
+.pc-separator{height:1px;background:var(--border);margin:1rem 0}
+.pc-footer{background:var(--surface);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;color:var(--text3);border-top:1px solid var(--border)}
+.pc-footer .pc-market{font-weight:600;color:var(--text2)}
+/* Accordion */
+.accordion-item{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:0.65rem;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.03);transition:box-shadow 0.2s}
+.accordion-item:hover{box-shadow:0 4px 16px rgba(0,0,0,0.06)}
+.accordion-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;cursor:pointer;user-select:none;transition:background 0.2s;gap:0.75rem}
+.accordion-header:hover{background:#fafbfc}
+.accordion-header .label{font-weight:600;font-size:0.92rem;color:var(--text);display:flex;align-items:center;gap:0.45rem}
+.accordion-header .label .icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0}
+.accordion-header .arrow{color:var(--text3);font-size:0.7rem;transition:transform 0.2s;flex-shrink:0}
 .accordion-item.open .accordion-header .arrow{transform:rotate(180deg)}
-.accordion-body{display:none;padding:0 1rem 1rem}
+.accordion-body{display:none;padding:0 1.25rem 1.25rem}
 .accordion-item.open .accordion-body{display:block}
-.accordion-body pre{white-space:pre-wrap;word-break:break-word;font-size:0.88rem;color:var(--text);line-height:1.6;margin-bottom:0.75rem}
+.accordion-body .content{white-space:pre-wrap;word-break:break-word;font-size:0.9rem;color:var(--text);line-height:1.7;background:var(--surface);padding:1rem;border-radius:8px;border:1px solid var(--border);margin-bottom:0.75rem}
 .copy-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 0.9rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.8rem;color:var(--text2);transition:all 0.2s}
 .copy-btn:hover{background:var(--surface3);color:var(--text)}
 .copy-btn.copied{background:rgba(52,199,89,0.12);border-color:#34c759;color:#34c759}
@@ -902,19 +921,67 @@ function formatContent(content) {
 function renderResults(data, tools) {
   const toolLabels = { title:'Заголовок', description:'Описание', keywords:'Ключевые слова', review_answers:'Ответы на отзывы', photo_ideas:'Идеи для фото', competitor_analysis:'Анализ конкурентов' };
   const toolKeys = { title:'title', description:'description', keywords:'keywords', review_answers:'review_answers', photo_ideas:'photo_ideas', competitor_analysis:'competitor_analysis' };
+  const toolIcons = { title:'📌', description:'📝', keywords:'🏷️', review_answers:'💬', photo_ideas:'📸', competitor_analysis:'📊' };
+
+  const allTools = ['title','description','keywords','review_answers','photo_ideas','competitor_analysis'];
+  const isCardMode = allTools.every(t => tools.includes(t));
+
+  if (isCardMode) {
+    const title = formatContent(data.title || data.result?.title || '');
+    const description = formatContent(data.description || data.result?.description || '');
+    const keywords = formatContent(data.keywords || data.result?.keywords || '');
+    const reviewAnswers = formatContent(data.review_answers || data.result?.review_answers || '');
+    const photoIdeas = formatContent(data.photo_ideas || data.result?.photo_ideas || '');
+    const competitorAnalysis = formatContent(data.competitor_analysis || data.result?.competitor_analysis || '');
+    const marketplace = document.querySelector('.gen-radio.active')?.textContent?.trim() || 'Маркетплейс';
+
+    const renderField = (label, icon, content) => {
+      if (!content) return '';
+      return `<div class="pc-field">
+        <div class="pc-field-label">${icon} ${label}</div>
+        <div class="pc-field-value">${content}</div>
+      </div>`;
+    };
+
+    const keywordTags = keywords ? keywords.split(',').map(k => `<span class="pc-tag">${k.trim()}</span>`).join('') : '';
+
+    genResults.innerHTML = `<div class="product-card">
+      <div class="product-card-header">
+        <div class="pc-badge">✨ SellerAI</div>
+        <h2 class="pc-title">${title || 'Карточка товара'}</h2>
+      </div>
+      <div class="product-card-body">
+        ${renderField('Описание', '📝', description)}
+        ${keywordTags ? `<div class="pc-field">
+          <div class="pc-field-label">🏷️ Ключевые слова</div>
+          <div class="pc-tags">${keywordTags}</div>
+        </div>` : ''}
+        <div class="pc-separator"></div>
+        ${renderField('Анализ конкурентов', '📊', competitorAnalysis)}
+        ${renderField('Идеи для фото', '📸', photoIdeas)}
+        ${renderField('Ответы на отзывы', '💬', reviewAnswers)}
+      </div>
+      <div class="pc-footer">
+        <span class="pc-market">${marketplace}</span>
+        <span>SellerAI</span>
+      </div>
+    </div>`;
+    genResults.classList.add('active');
+    return;
+  }
 
   const items = tools.map(t => {
     const content = data[toolKeys[t]] || data.result?.[toolKeys[t]] || data[t] || '';
     if (!content) return '';
-    const formatted = formatContent(content);
+    const iconColors = { title:'#0071e3', description:'#34c759', keywords:'#ff9500', review_answers:'#5856d6', photo_ideas:'#ff2d55', competitor_analysis:'#00c7be' };
     return `<div class="accordion-item open">
       <div class="accordion-header">
-        <span class="label">${toolLabels[t]}</span>
+        <span class="label"><span class="icon" style="background:${iconColors[t]+'15'}">${toolIcons[t]}</span>${toolLabels[t]}</span>
         <span class="arrow">▼</span>
       </div>
       <div class="accordion-body">
-        <pre>${formatted}</pre>
-        <button class="copy-btn" data-content="${escapeHtml(formatted)}">📋 Копировать</button>
+        <div class="content">${formatContent(content)}</div>
+        <button class="copy-btn" data-content="${escapeHtml(content)}">📋 Копировать</button>
       </div>
     </div>`;
   }).filter(Boolean).join('');
