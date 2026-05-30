@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SellerAI — Личный кабинет</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Onest:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:'Onest',-apple-system,sans-serif;background:#0A0A0A;color:#e0e0e0;line-height:1.5;overflow:hidden;height:100vh}
+button{cursor:pointer;font-family:inherit;border:none;background:none;color:inherit;font-size:inherit}
+input,textarea{font-family:inherit;font-size:inherit}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{font-family:'Unbounded',sans-serif;font-weight:600;letter-spacing:-0.02em}
+:root{--bg:#0A0A0A;--surface:#111;--surface2:#181818;--surface3:#222;--accent:#FF4D00;--accent-hover:#e04400;--text:#e0e0e0;--text2:#888;--text3:#555;--border:#2a2a2a;--sidebar-w:240px;--radius:12px;--radius-sm:8px}
+
+/* ── Auth Screen ── */
+#screen-auth{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem;background:var(--bg)}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2.5rem;width:100%;max-width:400px}
+.auth-logo{font-family:'Unbounded',sans-serif;font-size:1.5rem;font-weight:700;color:var(--accent);text-align:center;margin-bottom:1.5rem}
+.auth-toggle{display:flex;background:var(--surface2);border-radius:var(--radius-sm);padding:3px;margin-bottom:1.5rem}
+.auth-toggle button{flex:1;padding:0.6rem;border-radius:6px;font-size:0.85rem;font-weight:500;color:var(--text2);transition:all 0.2s}
+.auth-toggle button.active{background:var(--accent);color:#fff}
+.auth-form{display:flex;flex-direction:column;gap:0.75rem}
+.auth-form input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.8rem 1rem;color:var(--text);outline:none;transition:border-color 0.2s;font-size:0.9rem}
+.auth-form input:focus{border-color:var(--accent)}
+.auth-form .btn-primary{background:var(--accent);color:#fff;border:none;padding:0.85rem;border-radius:var(--radius-sm);font-weight:600;font-size:0.95rem;transition:background 0.2s}
+.auth-form .btn-primary:hover{background:var(--accent-hover)}
+.auth-form .auth-error{color:#ff4444;font-size:0.8rem;text-align:center;min-height:1.2rem}
+.auth-form .auth-success{color:#4caf50;font-size:0.8rem;text-align:center;min-height:1.2rem}
+
+/* ── Dashboard Layout ── */
+#screen-dashboard{display:flex;height:100vh}
+
+/* Sidebar */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;transition:transform 0.3s ease}
+.sidebar-header{padding:1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-logo{font-family:'Unbounded',sans-serif;font-size:1.2rem;font-weight:700;color:var(--accent)}
+.sidebar-close{display:none;font-size:1.5rem;color:var(--text2);padding:0.25rem}
+.sidebar-nav{flex:1;padding:0.75rem 0;display:flex;flex-direction:column;gap:2px}
+.sidebar-nav button{padding:0.7rem 1.25rem;text-align:left;font-size:0.9rem;font-weight:500;color:var(--text2);transition:all 0.2s;border-radius:0;position:relative}
+.sidebar-nav button:hover{color:var(--text);background:rgba(255,255,255,0.03)}
+.sidebar-nav button.active{color:var(--accent);background:rgba(255,77,0,0.08)}
+.sidebar-nav button.active::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;background:var(--accent);border-radius:0 2px 2px 0}
+.sidebar-footer{padding:1rem 1.25rem;border-top:1px solid var(--border)}
+.sidebar-gens{font-size:0.8rem;color:var(--text2);margin-bottom:0.5rem}
+.sidebar-gens span{color:var(--accent);font-weight:600}
+.sidebar-logout{width:100%;padding:0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text2);font-size:0.85rem;font-weight:500;transition:all 0.2s}
+.sidebar-logout:hover{background:var(--surface3);color:#ff4444;border-color:#ff444444}
+
+/* Content */
+.content{flex:1;margin-left:var(--sidebar-w);overflow-y:auto;height:100vh;padding:2rem}
+.screen-content{display:none;animation:fadeIn 0.25s ease}
+.screen-content.active{display:block}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Mobile header */
+.mobile-header{display:none;padding:0.75rem 1rem;background:var(--surface);border-bottom:1px solid var(--border);align-items:center;gap:0.75rem;position:sticky;top:0;z-index:100}
+.mobile-header .burger{font-size:1.5rem;color:var(--text2);padding:0.25rem}
+.mobile-header span{font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:700;color:var(--accent)}
+
+/* ── Generator Screen ── */
+.generator{max-width:720px;margin:0 auto}
+.generator h1{font-size:1.5rem;margin-bottom:0.25rem}
+.generator .sub{color:var(--text2);font-size:0.85rem;margin-bottom:1.5rem}
+.gen-textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;color:var(--text);font-size:0.95rem;resize:vertical;min-height:100px;outline:none;transition:border-color 0.2s}
+.gen-textarea:focus{border-color:var(--accent)}
+.gen-textarea::placeholder{color:var(--text3)}
+.gen-section{margin-top:1.25rem}
+.gen-section label{display:block;font-size:0.85rem;font-weight:600;color:var(--text2);margin-bottom:0.5rem}
+.gen-radios{display:flex;gap:0.5rem;flex-wrap:wrap}
+.gen-radio{flex:1;min-width:100px;padding:0.6rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);text-align:center;font-size:0.85rem;font-weight:500;color:var(--text2);transition:all 0.2s;cursor:pointer}
+.gen-radio:hover{border-color:var(--text3)}
+.gen-radio.active{background:rgba(255,77,0,0.12);border-color:var(--accent);color:var(--accent)}
+.gen-checkboxes{display:flex;flex-wrap:wrap;gap:0.5rem}
+.gen-checkbox{display:flex;align-items:center;gap:0.4rem;padding:0.5rem 0.8rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.8rem;color:var(--text2);cursor:pointer;transition:all 0.2s;user-select:none}
+.gen-checkbox:hover{border-color:var(--text3)}
+.gen-checkbox.active{background:rgba(255,77,0,0.12);border-color:var(--accent);color:var(--accent)}
+.gen-checkbox input{display:none}
+.gen-checkbox .check{width:16px;height:16px;border:2px solid var(--text3);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all 0.2s;flex-shrink:0}
+.gen-checkbox.active .check{border-color:var(--accent);background:var(--accent);color:#fff}
+.gen-submit{width:100%;margin-top:1.25rem;padding:0.9rem;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-weight:600;font-size:1rem;transition:background 0.2s}
+.gen-submit:hover{background:var(--accent-hover)}
+.gen-submit:disabled{opacity:0.5;cursor:not-allowed}
+
+/* ── Loader ── */
+.loader{display:none;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem;margin-top:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.loader.active{display:flex}
+.loader-dots{display:flex;gap:6px;margin-bottom:0.75rem}
+.loader-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;animation:loaderBounce 1.2s ease-in-out infinite}
+.loader-dot:nth-child(2){animation-delay:0.15s}
+.loader-dot:nth-child(3){animation-delay:0.3s}
+@keyframes loaderBounce{0%,80%,100%{opacity:0.3;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+.loader-text{color:var(--text2);font-size:0.9rem;font-weight:500}
+
+/* ── Results Accordion ── */
+.results{display:none;margin-top:1.5rem}
+.results.active{display:block}
+.accordion-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:0.5rem;overflow:hidden}
+.accordion-header{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;cursor:pointer;user-select:none;transition:background 0.2s}
+.accordion-header:hover{background:var(--surface2)}
+.accordion-header .label{font-weight:600;font-size:0.9rem;color:var(--text)}
+.accordion-header .arrow{color:var(--text3);font-size:0.75rem;transition:transform 0.2s}
+.accordion-item.open .accordion-header .arrow{transform:rotate(180deg)}
+.accordion-body{display:none;padding:0 1rem 1rem}
+.accordion-item.open .accordion-body{display:block}
+.accordion-body pre{white-space:pre-wrap;word-break:break-word;font-size:0.88rem;color:var(--text);line-height:1.6;margin-bottom:0.75rem}
+.copy-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 0.9rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.8rem;color:var(--text2);transition:all 0.2s}
+.copy-btn:hover{background:var(--surface3);color:var(--text)}
+.copy-btn.copied{background:rgba(76,175,80,0.15);border-color:#4caf50;color:#4caf50}
+
+/* ── History Screen ── */
+.history{max-width:860px;margin:0 auto}
+.history h1{font-size:1.5rem;margin-bottom:0.25rem}
+.history .sub{color:var(--text2);font-size:0.85rem;margin-bottom:1.5rem}
+.history-empty{padding:2.5rem;text-align:center;color:var(--text3);font-size:0.9rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.history-table{width:100%;border-collapse:collapse}
+.history-table th{padding:0.7rem 0.75rem;font-size:0.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;text-align:left;border-bottom:1px solid var(--border)}
+.history-table td{padding:0.75rem;font-size:0.85rem;color:var(--text);border-bottom:1px solid var(--border);vertical-align:middle}
+.history-table tr{transition:background 0.15s;cursor:pointer}
+.history-table tbody tr:hover{background:rgba(255,255,255,0.02)}
+.history-tools{display:flex;gap:0.3rem;flex-wrap:wrap}
+.history-tools span{padding:2px 8px;background:var(--surface2);border-radius:4px;font-size:0.7rem;color:var(--text2);white-space:nowrap}
+.history-open{padding:0.4rem 0.75rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.75rem;color:var(--text2);transition:all 0.2s}
+.history-open:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── Profile Screen ── */
+.profile{max-width:560px;margin:0 auto}
+.profile h1{font-size:1.5rem;margin-bottom:0.25rem}
+.profile .sub{color:var(--text2);font-size:0.85rem;margin-bottom:1.5rem}
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem}
+.profile-card .label{font-size:0.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem}
+.profile-card .value{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:0.5rem}
+.profile-card .value:last-child{margin-bottom:0}
+.progress-wrap{margin-top:0.75rem}
+.progress-bar{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-bottom:0.35rem}
+.progress-fill{height:100%;background:var(--accent);border-radius:4px;transition:width 0.4s ease}
+.progress-label{font-size:0.8rem;color:var(--text2);display:flex;justify-content:space-between}
+.tariff-cards{display:flex;gap:0.75rem;margin-top:1rem}
+.tariff-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center;transition:all 0.2s;cursor:pointer}
+.tariff-card:hover{border-color:var(--text3)}
+.tariff-card.active{border-color:var(--accent);background:rgba(255,77,0,0.06)}
+.tariff-card .t-name{font-size:0.8rem;font-weight:600;color:var(--text);margin-bottom:0.15rem}
+.tariff-card .t-price{font-size:0.7rem;color:var(--text2);margin-bottom:0.5rem}
+.tariff-card .t-btn{padding:0.4rem 0.75rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.75rem;color:var(--text2);transition:all 0.2s}
+.tariff-card .t-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tariff-card.active .t-btn{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ── Modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.active{display:flex}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:600px;width:100%;max-height:80vh;display:flex;flex-direction:column}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+.modal-header h3{font-size:1rem;color:var(--text)}
+.modal-close{font-size:1.5rem;color:var(--text3);padding:0.25rem;transition:color 0.2s}
+.modal-close:hover{color:var(--text)}
+.modal-body{overflow-y:auto;padding:1.25rem}
+.modal-body pre{white-space:pre-wrap;word-break:break-word;font-size:0.88rem;color:var(--text);line-height:1.6}
+.modal-body .modal-tool-section{margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.modal-body .modal-tool-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.modal-body .modal-tool-label{font-weight:600;font-size:0.85rem;color:var(--accent);margin-bottom:0.4rem}
+
+/* ── Toast ── */
+.toast-container{position:fixed;top:1rem;right:1rem;z-index:3000;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none}
+.toast{pointer-events:auto;padding:0.75rem 1rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:500;animation:toastIn 0.3s ease;min-width:200px;max-width:360px;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.toast.error{background:#441111;border:1px solid #ff444455;color:#ff6666}
+.toast.success{background:#0d2e0d;border:1px solid #4caf5055;color:#6fde6f}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+
+/* ── Overlay ── */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-close{display:block}
+  .sidebar-overlay.active{display:block}
+  .content{margin-left:0;padding:1rem}
+  .mobile-header{display:flex}
+  .tariff-cards{flex-direction:column}
+  .gen-radio{min-width:80px}
+  .history-table{font-size:0.8rem}
+  .history-table th,.history-table td{padding:0.5rem}
+}
+
+@media(max-width:480px){
+  .content{padding:0.75rem}
+  .auth-card{padding:1.5rem}
+  .generator h1,.history h1,.profile h1{font-size:1.2rem}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+<!-- Auth Screen -->
+<div id="screen-auth" class="screen">
+  <div class="auth-card">
+    <div class="auth-logo">SellerAI</div>
+    <div class="auth-toggle" id="auth-toggle">
+      <button class="active" data-mode="login">Войти</button>
+      <button data-mode="register">Создать аккаунт</button>
+    </div>
+    <form class="auth-form" id="auth-form" autocomplete="off">
+      <input type="email" id="auth-email" placeholder="Email" required autocomplete="email">
+      <input type="password" id="auth-password" placeholder="Пароль" required autocomplete="current-password">
+      <div id="auth-feedback" class="auth-error"></div>
+      <button type="submit" class="btn-primary" id="auth-submit">Войти</button>
+    </form>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="screen-dashboard" style="display:none">
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">SellerAI</div>
+      <button class="sidebar-close" id="sidebar-close">&times;</button>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <button class="active" data-screen="generator">📝 Генератор</button>
+      <button data-screen="history">📋 История</button>
+      <button data-screen="profile">👤 Профиль</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-gens">Остаток генераций: <span id="gen-count">0</span></div>
+      <button class="sidebar-logout" id="logout-btn">🚪 Выйти</button>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="content" id="content">
+    <!-- Mobile Header -->
+    <div class="mobile-header" id="mobile-header">
+      <button class="burger" id="burger-btn">☰</button>
+      <span>SellerAI</span>
+    </div>
+
+    <!-- Generator -->
+    <div class="screen-content active" id="screen-generator">
+      <div class="generator">
+        <h1>Генератор контента</h1>
+        <p class="sub">Введите название товара или ссылку и выберите инструменты</p>
+
+        <textarea class="gen-textarea" id="gen-input" placeholder="Вставь название товара или ссылку..." rows="4"></textarea>
+
+        <div class="gen-section">
+          <label>Маркетплейс</label>
+          <div class="gen-radios" id="gen-marketplace">
+            <button class="gen-radio active" data-value="WB">📦 Wildberries</button>
+            <button class="gen-radio" data-value="Ozon">🔵 Ozon</button>
+            <button class="gen-radio" data-value="Yandex">🟡 Яндекс Маркет</button>
+          </div>
+        </div>
+
+        <div class="gen-section">
+          <label>Инструменты</label>
+          <div class="gen-checkboxes" id="gen-tools">
+            <label class="gen-checkbox active" data-tool="title">
+              <input type="checkbox" checked><span class="check">✓</span> Заголовок
+            </label>
+            <label class="gen-checkbox active" data-tool="description">
+              <input type="checkbox" checked><span class="check">✓</span> Описание
+            </label>
+            <label class="gen-checkbox active" data-tool="keywords">
+              <input type="checkbox" checked><span class="check">✓</span> Ключевые слова
+            </label>
+            <label class="gen-checkbox" data-tool="review_answers">
+              <input type="checkbox"><span class="check"></span> Ответы на отзывы
+            </label>
+            <label class="gen-checkbox" data-tool="photo_ideas">
+              <input type="checkbox"><span class="check"></span> Идеи для фото
+            </label>
+            <label class="gen-checkbox" data-tool="competitor_analysis">
+              <input type="checkbox"><span class="check"></span> Анализ конкурентов
+            </label>
+          </div>
+        </div>
+
+        <button class="gen-submit" id="gen-submit">Сгенерировать</button>
+
+        <!-- Loader -->
+        <div class="loader" id="gen-loader">
+          <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+          </div>
+          <div class="loader-text">ИИ думает...</div>
+        </div>
+
+        <!-- Results -->
+        <div class="results" id="gen-results"></div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="screen-content" id="screen-history">
+      <div class="history">
+        <h1>История генераций</h1>
+        <p class="sub">Все ваши сгенерированные материалы</p>
+        <div class="history-empty" id="history-empty">История пуста. Создайте первую генерацию.</div>
+        <div id="history-table-wrap" style="display:none">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Товар</th>
+                <th>Инструменты</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="screen-content" id="screen-profile">
+      <div class="profile">
+        <h1>Профиль и тариф</h1>
+        <p class="sub">Управление аккаунтом и подпиской</p>
+
+        <div class="profile-card">
+          <div class="label">Email</div>
+          <div class="value" id="profile-email">—</div>
+        </div>
+
+        <div class="profile-card">
+          <div class="label">Текущий тариф</div>
+          <div class="value" id="profile-tariff">—</div>
+          <div class="progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill" id="profile-progress" style="width:0%"></div>
+            </div>
+            <div class="progress-label">
+              <span id="profile-used">0</span>
+              <span>лимит: <span id="profile-limit">0</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-card">
+          <div class="label">Сменить тариф</div>
+          <div class="tariff-cards">
+            <div class="tariff-card" data-tariff="starter">
+              <div class="t-name">Starter</div>
+              <div class="t-price">499 ₽/мес</div>
+              <button class="t-btn">Выбрать</button>
+            </div>
+            <div class="tariff-card" data-tariff="business">
+              <div class="t-name">Business</div>
+              <div class="t-price">999 ₽/мес</div>
+              <button class="t-btn">Выбрать</button>
+            </div>
+            <div class="tariff-card" data-tariff="pro">
+              <div class="t-name">Pro</div>
+              <div class="t-price">1 990 ₽/мес</div>
+              <button class="t-btn">Выбрать</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title">Результат генерации</h3>
+      <button class="modal-close" id="modal-close">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container" id="toast-container"></div>
+
+</div>
+
+<script>
+/* ── State ── */
+const state = {
+  token: localStorage.getItem('sellerai_token') || null,
+  screen: 'generator',
+  user: null,
+  history: [],
+  generationResult: null,
+  isGenerating: false,
+  authMode: 'login'
+};
+
+const API_BASE = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000'
+  : 'https://sellerai-backend.onrender.com';
+
+/* ── DOM Refs ── */
+const $ = id => document.getElementById(id);
+const screenAuth = $('screen-auth');
+const screenDashboard = $('screen-dashboard');
+const authForm = $('auth-form');
+const authEmail = $('auth-email');
+const authPassword = $('auth-password');
+const authSubmit = $('auth-submit');
+const authFeedback = $('auth-feedback');
+const authToggle = $('auth-toggle');
+const sidebar = $('sidebar');
+const sidebarOverlay = $('sidebar-overlay');
+const sidebarNav = $('sidebar-nav');
+const genCount = $('gen-count');
+const logoutBtn = $('logout-btn');
+const burgerBtn = $('burger-btn');
+const sidebarClose = $('sidebar-close');
+
+const genInput = $('gen-input');
+const genMarketplace = $('gen-marketplace');
+const genTools = $('gen-tools');
+const genSubmit = $('gen-submit');
+const genLoader = $('gen-loader');
+const genResults = $('gen-results');
+
+const historyBody = $('history-body');
+const historyEmpty = $('history-empty');
+const historyTableWrap = $('history-table-wrap');
+
+const profileEmail = $('profile-email');
+const profileTariff = $('profile-tariff');
+const profileProgress = $('profile-progress');
+const profileUsed = $('profile-used');
+const profileLimit = $('profile-limit');
+
+const modalOverlay = $('modal-overlay');
+const modalBody = $('modal-body');
+const modalClose = $('modal-close');
+const toastContainer = $('toast-container');
+
+/* ── Utilities ── */
+function showToast(message, type) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = message;
+  toastContainer.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.remove(); }, 3500);
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen-content').forEach(el => el.classList.remove('active'));
+  const target = $('screen-' + name);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
+  const navBtn = document.querySelector(`.sidebar-nav button[data-screen="${name}"]`);
+  if (navBtn) navBtn.classList.add('active');
+  state.screen = name;
+}
+
+function showAuthError(msg) { authFeedback.textContent = msg; authFeedback.className = 'auth-error'; }
+function showAuthSuccess(msg) { authFeedback.textContent = msg; authFeedback.className = 'auth-success'; }
+function clearAuthFeedback() { authFeedback.textContent = ''; }
+
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  sidebarOverlay.classList.remove('active');
+}
+
+function openSidebar() {
+  sidebar.classList.add('open');
+  sidebarOverlay.classList.add('active');
+}
+
+/* ── API Request ── */
+async function apiRequest(method, path, body) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' }
+  };
+  if (state.token) opts.headers['Authorization'] = 'Bearer ' + state.token;
+  if (body) opts.body = JSON.stringify(body);
+
+  const controller = new AbortController();
+  opts.signal = controller.signal;
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const res = await fetch(API_BASE + path, opts);
+    clearTimeout(timeoutId);
+
+    if (res.status === 401) {
+      localStorage.removeItem('sellerai_token');
+      state.token = null;
+      state.user = null;
+      screenAuth.style.display = 'flex';
+      screenDashboard.style.display = 'none';
+      showToast('Сессия истекла, войдите снова', 'error');
+      return null;
+    }
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || data.message || 'Ошибка запроса');
+    }
+    return data;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') throw new Error('Сервер не отвечает. Попробуйте позже.');
+    throw err;
+  }
+}
+
+/* ── Auth ── */
+async function handleAuth(e) {
+  e.preventDefault();
+  clearAuthFeedback();
+
+  const email = authEmail.value.trim();
+  const password = authPassword.value.trim();
+
+  if (!email) { showAuthError('Введите email'); return; }
+  if (!password) { showAuthError('Введите пароль'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAuthError('Некорректный email'); return; }
+  if (password.length < 6) { showAuthError('Пароль должен быть не менее 6 символов'); return; }
+
+  authSubmit.disabled = true;
+  authSubmit.textContent = 'Загрузка...';
+
+  try {
+    const endpoint = state.authMode === 'login' ? '/auth/login' : '/auth/register';
+    const data = await apiRequest('POST', endpoint, { email, password });
+    if (!data) return;
+
+    if (data.access_token || data.token) {
+      const token = data.access_token || data.token;
+      localStorage.setItem('sellerai_token', token);
+      state.token = token;
+    }
+
+    showToast(state.authMode === 'login' ? 'Вход выполнен' : 'Аккаунт создан', 'success');
+    await loadDashboard();
+  } catch (err) {
+    showAuthError(err.message);
+  } finally {
+    authSubmit.disabled = false;
+    authSubmit.textContent = state.authMode === 'login' ? 'Войти' : 'Создать аккаунт';
+  }
+}
+
+function setAuthMode(mode) {
+  state.authMode = mode;
+  document.querySelectorAll('.auth-toggle button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  authSubmit.textContent = mode === 'login' ? 'Войти' : 'Создать аккаунт';
+  clearAuthFeedback();
+}
+
+/* ── Dashboard ── */
+async function loadDashboard() {
+  try {
+    const me = await apiRequest('GET', '/me');
+    if (!me) return;
+    state.user = me;
+    screenAuth.style.display = 'none';
+    screenDashboard.style.display = 'flex';
+
+    const used = me.generations_used || 0;
+    const limit = me.generations_limit || 0;
+    const genRemaining = Math.max(0, limit - used);
+    genCount.textContent = genRemaining;
+
+    profileEmail.textContent = me.email || '—';
+    const tariffNames = { starter: 'Starter', business: 'Business', pro: 'Pro' };
+    profileTariff.textContent = tariffNames[me.tariff] || me.tariff || '—';
+    const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
+    profileProgress.style.width = pct + '%';
+    profileUsed.textContent = used;
+    profileLimit.textContent = limit;
+
+    document.querySelectorAll('.tariff-card').forEach(c => c.classList.toggle('active', c.dataset.tariff === me.tariff));
+
+    showScreen('generator');
+    loadHistory();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function loadHistory() {
+  try {
+    const data = await apiRequest('GET', '/history');
+    if (!data) return;
+    state.history = Array.isArray(data) ? data : (data.items || data.history || []);
+    renderHistory();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+function renderHistory() {
+  if (!state.history.length) {
+    historyEmpty.style.display = 'block';
+    historyTableWrap.style.display = 'none';
+    return;
+  }
+  historyEmpty.style.display = 'none';
+  historyTableWrap.style.display = 'block';
+
+  const toolLabels = { title:'Заголовок', description:'Описание', keywords:'Ключевые слова', review_answers:'Отзывы', photo_ideas:'Фото', competitor_analysis:'Анализ' };
+
+  historyBody.innerHTML = state.history.map(item => {
+    const tools = (item.tools || item.selected_tools || []);
+    const product = item.product || item.product_name || '—';
+    const date = item.date || item.created_at || '—';
+    const dateStr = date ? new Date(date).toLocaleDateString('ru-RU') : '—';
+    return `<tr data-id="${item.id || ''}">
+      <td style="white-space:nowrap">${dateStr}</td>
+      <td>${product}</td>
+      <td><div class="history-tools">${tools.map(t => `<span>${toolLabels[t] || t}</span>`).join('')}</div></td>
+      <td><button class="history-open" data-id="${item.id || ''}">Открыть</button></td>
+    </tr>`;
+  }).join('');
+
+  historyBody.querySelectorAll('.history-open').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const id = this.dataset.id;
+      const item = state.history.find(i => (i.id || '').toString() === id);
+      if (item) showHistoryModal(item);
+    });
+  });
+
+  historyBody.querySelectorAll('tr').forEach(tr => {
+    tr.addEventListener('click', function() {
+      const id = this.dataset.id;
+      const item = state.history.find(i => (i.id || '').toString() === id);
+      if (item) showHistoryModal(item);
+    });
+  });
+}
+
+function showHistoryModal(item) {
+  const toolLabels = { title:'Заголовок', description:'Описание', keywords:'Ключевые слова', review_answers:'Ответы на отзывы', photo_ideas:'Идеи для фото', competitor_analysis:'Анализ конкурентов' };
+  const result = item.result || item.generated_content || {};
+  modalBody.innerHTML = Object.keys(toolLabels).map(key => {
+    const content = result[key];
+    if (!content) return '';
+    return `<div class="modal-tool-section">
+      <div class="modal-tool-label">${toolLabels[key]}</div>
+      <pre>${content}</pre>
+    </div>`;
+  }).join('');
+  modalOverlay.classList.add('active');
+}
+
+/* ── Generate ── */
+async function handleGenerate() {
+  const product = genInput.value.trim();
+  if (!product) { showToast('Введите название товара или ссылку', 'error'); genInput.focus(); return; }
+
+  const marketplace = genMarketplace.querySelector('.gen-radio.active').dataset.value;
+  const tools = [];
+  genTools.querySelectorAll('.gen-checkbox').forEach(el => {
+    if (el.classList.contains('active')) tools.push(el.dataset.tool);
+  });
+  if (!tools.length) { showToast('Выберите хотя бы один инструмент', 'error'); return; }
+
+  state.isGenerating = true;
+  genSubmit.disabled = true;
+  genSubmit.textContent = 'Генерация...';
+  genLoader.classList.add('active');
+  genResults.classList.remove('active');
+  genResults.innerHTML = '';
+
+  try {
+    const data = await apiRequest('POST', '/generate', { product, marketplace, tools });
+    if (!data) return;
+
+    state.generationResult = data;
+    renderResults(data, tools);
+    showToast('Генерация завершена', 'success');
+    loadHistory();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    state.isGenerating = false;
+    genSubmit.disabled = false;
+    genSubmit.textContent = 'Сгенерировать';
+    genLoader.classList.remove('active');
+  }
+}
+
+function renderResults(data, tools) {
+  const toolLabels = { title:'Заголовок', description:'Описание', keywords:'Ключевые слова', review_answers:'Ответы на отзывы', photo_ideas:'Идеи для фото', competitor_analysis:'Анализ конкурентов' };
+  const toolKeys = { title:'title', description:'description', keywords:'keywords', review_answers:'review_answers', photo_ideas:'photo_ideas', competitor_analysis:'competitor_analysis' };
+
+  const items = tools.map(t => {
+    const content = data[toolKeys[t]] || data.result?.[toolKeys[t]] || data[t] || '';
+    if (!content) return '';
+    return `<div class="accordion-item open">
+      <div class="accordion-header">
+        <span class="label">${toolLabels[t]}</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <pre>${content}</pre>
+        <button class="copy-btn" data-content="${escapeHtml(content)}">📋 Копировать</button>
+      </div>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  genResults.innerHTML = items;
+  genResults.classList.add('active');
+
+  genResults.querySelectorAll('.accordion-header').forEach(h => {
+    h.addEventListener('click', function() {
+      this.parentElement.classList.toggle('open');
+    });
+  });
+
+  genResults.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const txt = this.dataset.content;
+      navigator.clipboard.writeText(txt).then(() => {
+        this.textContent = 'Скопировано ✓';
+        this.classList.add('copied');
+        setTimeout(() => {
+          this.textContent = '📋 Копировать';
+          this.classList.remove('copied');
+        }, 2000);
+      }).catch(() => {
+        showToast('Не удалось скопировать', 'error');
+      });
+    });
+  });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+/* ── Logout ── */
+function logout() {
+  localStorage.removeItem('sellerai_token');
+  state.token = null;
+  state.user = null;
+  state.history = [];
+  state.generationResult = null;
+  screenDashboard.style.display = 'none';
+  screenAuth.style.display = 'flex';
+  authEmail.value = '';
+  authPassword.value = '';
+  clearAuthFeedback();
+  closeSidebar();
+  showToast('Вы вышли из системы', 'success');
+}
+
+/* ── Tariff Change ── */
+async function changeTariff(tariff) {
+  showToast('Функция смены тарифа будет доступна в ближайшее время', 'success');
+}
+
+/* ── Event Listeners ── */
+
+// Auth toggle
+authToggle.addEventListener('click', function(e) {
+  if (e.target.tagName === 'BUTTON') setAuthMode(e.target.dataset.mode);
+});
+
+// Auth form
+authForm.addEventListener('submit', handleAuth);
+
+// Enter key on password field
+authPassword.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') authForm.dispatchEvent(new Event('submit'));
+});
+
+// Auth email enter too
+authEmail.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') authForm.dispatchEvent(new Event('submit'));
+});
+
+// Sidebar navigation
+sidebarNav.addEventListener('click', function(e) {
+  const btn = e.target.closest('button[data-screen]');
+  if (!btn) return;
+  showScreen(btn.dataset.screen);
+  closeSidebar();
+  if (btn.dataset.screen === 'history') loadHistory();
+  if (btn.dataset.screen === 'profile') loadDashboard();
+});
+
+// Burger menu
+burgerBtn.addEventListener('click', openSidebar);
+sidebarOverlay.addEventListener('click', closeSidebar);
+sidebarClose.addEventListener('click', closeSidebar);
+
+// Logout
+logoutBtn.addEventListener('click', logout);
+
+// Marketplace radio
+genMarketplace.addEventListener('click', function(e) {
+  const btn = e.target.closest('.gen-radio');
+  if (!btn) return;
+  genMarketplace.querySelectorAll('.gen-radio').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+});
+
+// Tools checkboxes
+genTools.addEventListener('click', function(e) {
+  const label = e.target.closest('.gen-checkbox');
+  if (!label) return;
+  const cb = label.querySelector('input[type="checkbox"]');
+  cb.checked = !cb.checked;
+  label.classList.toggle('active', cb.checked);
+});
+
+// Generate
+genSubmit.addEventListener('click', handleGenerate);
+// Ctrl+Enter in textarea
+genInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleGenerate();
+});
+
+// Modal
+modalClose.addEventListener('click', function() { modalOverlay.classList.remove('active'); });
+modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) modalOverlay.classList.remove('active'); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') modalOverlay.classList.remove('active'); });
+
+// Tariff cards
+document.querySelectorAll('.tariff-card').forEach(card => {
+  card.addEventListener('click', function() {
+    const tariff = this.dataset.tariff;
+    if (tariff && tariff !== (state.user?.tariff || '')) changeTariff(tariff);
+  });
+});
+
+/* ── Init ── */
+async function init() {
+  if (state.token) {
+    try {
+      await loadDashboard();
+      return;
+    } catch (err) {
+      if (err.message.includes('401') || err.message.includes('истекла')) {
+        // Already handled in apiRequest
+      }
+    }
+  }
+
+  // Show auth if no token or failed
+  if (!state.token) {
+    screenAuth.style.display = 'flex';
+    screenDashboard.style.display = 'none';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
