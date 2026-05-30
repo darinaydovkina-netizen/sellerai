@@ -78,7 +78,26 @@ a{color:inherit;text-decoration:none}
 .mobile-header .burger{font-size:1.5rem;color:var(--text2);padding:0.25rem}
 .mobile-header span{font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;color:var(--accent)}
 
-/* Generator Screen */
+/* Home Screen */
+.home{max-width:720px;margin:0 auto}
+.home-header{margin-bottom:1.5rem}
+.home-header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em}
+.home-header .sub{color:var(--text2);font-size:0.9rem;margin-top:0.25rem}
+.home-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem}
+.home-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.04);transition:all 0.3s}
+.home-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.08)}
+.home-card-icon{font-size:1.5rem;margin-bottom:0.5rem}
+.home-card-value{font-size:1.75rem;font-weight:700;color:var(--accent);letter-spacing:-0.03em}
+.home-card-label{font-size:0.78rem;color:var(--text2);margin-top:0.25rem}
+.home-actions{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.5rem}
+.home-action-btn{display:flex;align-items:center;gap:0.75rem;padding:1rem 1.25rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 2px 8px rgba(0,0,0,0.03);transition:all 0.2s;cursor:pointer;width:100%;text-align:left}
+.home-action-btn:hover{border-color:var(--accent);background:rgba(0,113,227,0.03);transform:translateX(4px)}
+.home-action-icon{font-size:1.25rem;flex-shrink:0}
+.home-action-text{flex:1;font-size:0.9rem;font-weight:500;color:var(--text)}
+.home-action-arrow{font-size:1rem;color:var(--text3);transition:all 0.2s}
+.home-action-btn:hover .home-action-arrow{color:var(--accent);transform:translateX(4px)}
+.home-tip{display:flex;align-items:flex-start;gap:0.75rem;padding:1rem 1.25rem;background:linear-gradient(135deg,rgba(0,113,227,0.05) 0%,rgba(255,77,0,0.03) 100%);border:1px solid var(--border);border-radius:var(--radius);font-size:0.85rem;color:var(--text2);line-height:1.5}
+.home-tip-icon{font-size:1.25rem;flex-shrink:0;margin-top:1px}
 .generator{max-width:720px;margin:0 auto}
 .generator h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:0.25rem}
 .generator h1::after{content:' ✨';display:inline}
@@ -262,7 +281,8 @@ a{color:inherit;text-decoration:none}
       <button class="sidebar-close" id="sidebar-close">&times;</button>
     </div>
     <nav class="sidebar-nav" id="sidebar-nav">
-      <button class="active" data-screen="generator">📝 Генератор</button>
+      <button data-screen="home">🏠 Главная</button>
+      <button data-screen="generator">📝 Генератор</button>
       <button data-screen="history">📋 История</button>
       <button data-screen="profile">👤 Профиль</button>
     </nav>
@@ -281,8 +301,59 @@ a{color:inherit;text-decoration:none}
       <span>SellerAI</span>
     </div>
 
+    <!-- Home -->
+    <div class="screen-content" id="screen-home">
+      <div class="home">
+        <div class="home-header">
+          <h1 id="home-greeting">Добро пожаловать!</h1>
+          <p class="sub">Вот сводка по вашему аккаунту</p>
+        </div>
+
+        <div class="home-stats">
+          <div class="home-card">
+            <div class="home-card-icon">📊</div>
+            <div class="home-card-value" id="home-gen-used">0</div>
+            <div class="home-card-label">Генераций использовано</div>
+          </div>
+          <div class="home-card">
+            <div class="home-card-icon">📦</div>
+            <div class="home-card-value" id="home-gen-left">0</div>
+            <div class="home-card-label">Осталось генераций</div>
+          </div>
+          <div class="home-card">
+            <div class="home-card-icon">⭐</div>
+            <div class="home-card-value" id="home-tariff">—</div>
+            <div class="home-card-label">Текущий тариф</div>
+          </div>
+        </div>
+
+        <div class="home-actions">
+          <button class="home-action-btn" onclick="showScreen('generator')">
+            <span class="home-action-icon">🚀</span>
+            <span class="home-action-text">Сгенерировать контент</span>
+            <span class="home-action-arrow">→</span>
+          </button>
+          <button class="home-action-btn" onclick="showScreen('history'); loadHistory()">
+            <span class="home-action-icon">📋</span>
+            <span class="home-action-text">История генераций</span>
+            <span class="home-action-arrow">→</span>
+          </button>
+          <button class="home-action-btn" onclick="showScreen('profile')">
+            <span class="home-action-icon">⚙️</span>
+            <span class="home-action-text">Настройки тарифа</span>
+            <span class="home-action-arrow">→</span>
+          </button>
+        </div>
+
+        <div class="home-tip">
+          <div class="home-tip-icon">💡</div>
+          <div class="home-tip-text">Совет: используй все 6 инструментов для максимального эффекта. Попробуй сгенерировать заголовок + описание + ключевые слова вместе!</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Generator -->
-    <div class="screen-content active" id="screen-generator">
+    <div class="screen-content" id="screen-generator">
       <div class="generator">
         <h1>Генератор контента</h1>
         <p class="sub">Введите название товара или ссылку и выберите инструменты</p>
@@ -664,7 +735,12 @@ async function loadDashboard() {
 
     document.querySelectorAll('.tariff-card').forEach(c => c.classList.toggle('active', c.dataset.tariff === tariffName));
 
-    showScreen('generator');
+    document.getElementById('home-gen-used').textContent = used;
+    document.getElementById('home-gen-left').textContent = genRemaining;
+    document.getElementById('home-tariff').textContent = tariffNames[tariffName] || tariffName;
+    document.getElementById('home-greeting').textContent = me.email ? `Привет, ${me.email.split('@')[0]}!` : 'Добро пожаловать!';
+
+    showScreen('home');
     loadHistory();
   } catch (err) {
     showToast(err.message, 'error');
