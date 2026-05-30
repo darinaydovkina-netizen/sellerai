@@ -214,10 +214,22 @@
     .pricing-item-desc { font-size: 0.75rem; color: var(--text-secondary); }
     .pricing-item.highlight .pricing-item-name { color: var(--accent-orange); font-weight: 600; }
 
-    .cta-section { text-align: center; padding: 2.5rem 1.5rem; border-top: 1px solid var(--border-light); position: relative; }
+    .cta-section {
+      text-align: center; padding: 3.5rem 1.5rem; border-top: 1px solid var(--border-light); position: relative;
+      background: linear-gradient(180deg, #ffffff 0%, #f5f7ff 60%, #eef3ff 100%);
+      overflow: hidden;
+    }
     .cta-section::before {
-      content: ''; position: absolute; top: -1.5rem; left: 50%; transform: translateX(-50%);
-      width: 60px; height: 3px; background: var(--accent-blue); border-radius: 2px; opacity: 0.3;
+      content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 350px;
+      background: radial-gradient(ellipse, rgba(0,113,227,0.08) 0%, transparent 60%);
+      border-radius: 50%; pointer-events: none;
+    }
+    .cta-section::after {
+      content: ''; position: absolute; bottom: -100px; right: -80px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,159,10,0.05) 0%, transparent 60%);
+      border-radius: 50%; pointer-events: none;
     }
     .cta-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 0.5rem; }
     .cta-sub { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem; }
@@ -393,7 +405,7 @@
 <section class="cta-section" id="cta" aria-label="Начать бесплатно">
   <h2 class="cta-title">Начните бесплатно</h2>
   <p class="cta-sub">7 дней бесплатного доступа.</p>
-  <a href="dashboard.html" class="btn-primary" style="padding:14px 28px;font-size:1rem;">Попробовать бесплатно →</a>
+  <a href="dashboard.html" class="btn-primary" style="padding:14px 28px;font-size:1rem;box-shadow:0 4px 20px rgba(0,113,227,0.15);">Попробовать бесплатно →</a>
 </section>
 
 </main>
