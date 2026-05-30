@@ -63,6 +63,10 @@ class UserResponse(BaseModel):
     created_at: datetime
 
 
+class OAuthUrlRequest(BaseModel):
+    provider: str
+
+
 class HistoryItem(BaseModel):
     id: int
     product: str
