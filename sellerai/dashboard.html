@@ -756,6 +756,22 @@ async function handleGenerate() {
   }
 }
 
+function formatContent(content) {
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) return content.join(', ');
+  if (typeof content === 'object' && content !== null) {
+    const parts = [];
+    if (content.high?.length) parts.push('Высокочастотные: ' + content.high.join(', '));
+    if (content.mid?.length) parts.push('Среднечастотные: ' + content.mid.join(', '));
+    if (content.low?.length) parts.push('Низкочастотные: ' + content.low.join(', '));
+    if (content.strengths?.length) parts.push('Сильные стороны: ' + content.strengths.join(', '));
+    if (content.weaknesses?.length) parts.push('Слабые стороны: ' + content.weaknesses.join(', '));
+    if (content.recommendations?.length) parts.push('Рекомендации: ' + content.recommendations.join(', '));
+    return parts.length ? parts.join('\n') : JSON.stringify(content, null, 2);
+  }
+  return String(content);
+}
+
 function renderResults(data, tools) {
   const toolLabels = { title:'Заголовок', description:'Описание', keywords:'Ключевые слова', review_answers:'Ответы на отзывы', photo_ideas:'Идеи для фото', competitor_analysis:'Анализ конкурентов' };
   const toolKeys = { title:'title', description:'description', keywords:'keywords', review_answers:'review_answers', photo_ideas:'photo_ideas', competitor_analysis:'competitor_analysis' };
@@ -763,14 +779,15 @@ function renderResults(data, tools) {
   const items = tools.map(t => {
     const content = data[toolKeys[t]] || data.result?.[toolKeys[t]] || data[t] || '';
     if (!content) return '';
+    const formatted = formatContent(content);
     return `<div class="accordion-item open">
       <div class="accordion-header">
         <span class="label">${toolLabels[t]}</span>
         <span class="arrow">▼</span>
       </div>
       <div class="accordion-body">
-        <pre>${content}</pre>
-        <button class="copy-btn" data-content="${escapeHtml(content)}">📋 Копировать</button>
+        <pre>${formatted}</pre>
+        <button class="copy-btn" data-content="${escapeHtml(formatted)}">📋 Копировать</button>
       </div>
     </div>`;
   }).filter(Boolean).join('');
