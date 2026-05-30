@@ -17,7 +17,19 @@
       color: #1d1d1f;
       line-height: 1.5;
       overflow-x: hidden;
+      position: relative;
     }
+    body::before {
+      content: ''; position: fixed; top: -300px; right: -200px; width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(0,113,227,0.05) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: ''; position: fixed; bottom: -200px; left: -200px; width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(255,77,0,0.04) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    .container, .hero, .product-visual, .metrics, .features, .calculator, .pricing, .cta-section, .footer { position: relative; z-index: 1; }
     img { max-width: 100%; display: block; }
     a { text-decoration: none; color: inherit; }
     button { cursor: pointer; font-family: inherit; }
@@ -99,7 +111,13 @@
       .nav-link { font-size: 0.65rem; }
     }
 
-    .hero { text-align: center; padding: 2.5rem 1.5rem 0; }
+    .hero { text-align: center; padding: 2.5rem 1.5rem 0; position: relative; }
+    .hero::before {
+      content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(0,113,227,0.06) 0%, transparent 60%);
+      border-radius: 50%; pointer-events: none;
+    }
     .hero-title {
       font-size: 3rem; font-weight: 700; color: var(--text-primary);
       letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 0.5rem;
@@ -120,12 +138,14 @@
       background: linear-gradient(180deg, var(--bg-secondary), var(--bg-tertiary));
       border-radius: var(--radius-lg); padding: 2rem 1.5rem;
       max-width: var(--content-width); margin: 0 auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.04);
     }
     .product-label { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; }
     .product-sublabel { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 1rem; }
     .product-card {
       background: white; border-radius: 12px; padding: 1rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.03);
     }
     .product-input-row { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
     .product-input {
@@ -161,21 +181,30 @@
       .metrics { gap: 1.5rem; }
     }
 
-    .features { padding: 1.5rem; border-top: 1px solid var(--border-subtle); }
+    .features { padding: 1.5rem; border-top: 1px solid var(--border-light); position: relative; }
+    .features::before {
+      content: ''; position: absolute; top: -1.5rem; left: 50%; transform: translateX(-50%);
+      width: 60px; height: 3px; background: var(--accent-blue); border-radius: 2px; opacity: 0.3;
+    }
     .features-header { text-align: center; margin-bottom: 1.5rem; }
     .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; max-width: 500px; margin: 0 auto; }
     .feature-card {
       background: var(--bg-secondary); border-radius: var(--radius-card);
-      padding: 1rem; transition: transform 0.2s;
+      padding: 1rem; transition: all 0.3s;
+      border: 1px solid transparent;
     }
-    .feature-card:hover { transform: scale(1.02); }
+    .feature-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-color: var(--border-light); }
     .feature-title { font-weight: 600; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 0.15rem; }
     .feature-desc { font-size: 0.8rem; color: var(--text-secondary); }
     @media (max-width: 480px) {
       .features-grid { grid-template-columns: 1fr; }
     }
 
-    .pricing { padding: 1.5rem; border-top: 1px solid var(--border-subtle); }
+    .pricing { padding: 1.5rem; border-top: 1px solid var(--border-light); position: relative; }
+    .pricing::before {
+      content: ''; position: absolute; top: -1.5rem; left: 50%; transform: translateX(-50%);
+      width: 60px; height: 3px; background: var(--accent-orange); border-radius: 2px; opacity: 0.3;
+    }
     .pricing-header { text-align: center; margin-bottom: 1.5rem; }
     .pricing-list { max-width: 400px; margin: 0 auto; }
     .pricing-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-subtle); }
@@ -185,7 +214,11 @@
     .pricing-item-desc { font-size: 0.75rem; color: var(--text-secondary); }
     .pricing-item.highlight .pricing-item-name { color: var(--accent-orange); font-weight: 600; }
 
-    .cta-section { text-align: center; padding: 2.5rem 1.5rem; }
+    .cta-section { text-align: center; padding: 2.5rem 1.5rem; border-top: 1px solid var(--border-light); position: relative; }
+    .cta-section::before {
+      content: ''; position: absolute; top: -1.5rem; left: 50%; transform: translateX(-50%);
+      width: 60px; height: 3px; background: var(--accent-blue); border-radius: 2px; opacity: 0.3;
+    }
     .cta-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 0.5rem; }
     .cta-sub { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem; }
 
@@ -194,8 +227,11 @@
     .calculator { padding: 1.5rem; border-top: 1px solid var(--border-subtle); }
     .calc-box {
       max-width: 500px; margin: 0 auto;
-      background: var(--bg-secondary); border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, #f0f4ff 100%);
+      border-radius: var(--radius-lg);
       padding: 1.5rem;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     }
     .calc-label { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
     .calc-value { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
@@ -325,21 +361,28 @@
     <div class="pricing-list">
       <div class="pricing-item reveal">
         <div>
-          <div class="pricing-item-name">Starter</div>
+          <div class="pricing-item-name">🌱 Free</div>
+          <div class="pricing-item-desc">5 генераций · Попробуй бесплатно</div>
+        </div>
+        <div class="pricing-item-price" style="color:#34c759;">0 ₽</div>
+      </div>
+      <div class="pricing-item reveal">
+        <div>
+          <div class="pricing-item-name">⚡ Starter</div>
           <div class="pricing-item-desc">50 генераций · 1 маркетплейс</div>
         </div>
         <div class="pricing-item-price">499 ₽/мес</div>
       </div>
       <div class="pricing-item highlight reveal">
         <div>
-          <div class="pricing-item-name">Business</div>
+          <div class="pricing-item-name">🔥 Business</div>
           <div class="pricing-item-desc">200 генераций · Все маркетплейсы</div>
         </div>
         <div class="pricing-item-price" style="color:var(--accent-orange);">999 ₽/мес</div>
       </div>
       <div class="pricing-item reveal">
         <div>
-          <div class="pricing-item-name">Pro</div>
+          <div class="pricing-item-name">🚀 Pro</div>
           <div class="pricing-item-desc">Безлимит · API доступ</div>
         </div>
         <div class="pricing-item-price">1 990 ₽/мес</div>
