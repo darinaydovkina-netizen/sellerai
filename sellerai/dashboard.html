@@ -371,7 +371,7 @@ a{color:inherit;text-decoration:none}
         </div>
 
           <div class="gen-section">
-            <label>Инструменты <span class="gen-select-all" id="gen-select-all" style="font-weight:400;font-size:0.75rem;color:var(--accent);cursor:pointer;margin-left:0.5rem;">🧾 Карточка товара</span></label>
+            <label>Инструменты</label>
           <div class="gen-checkboxes" id="gen-tools">
             <label class="gen-checkbox active" data-tool="title">
               <input type="checkbox" checked><span class="check">✓</span> Заголовок
@@ -393,6 +393,10 @@ a{color:inherit;text-decoration:none}
             </label>
           </div>
         </div>
+
+        <button class="gen-submit" id="gen-submit-card" style="width:100%;margin-bottom:0.5rem;padding:0.7rem;background:linear-gradient(135deg,#0071e3,#005bbf);color:#fff;border:none;border-radius:var(--radius-pill);font-weight:500;font-size:0.9rem;cursor:pointer;transition:opacity 0.2s;display:flex;align-items:center;justify-content:center;gap:0.4rem;" onmouseover="this.style.opacity=0.9" onmouseout="this.style.opacity=1">
+          🧾 Сгенерировать карточку товара
+        </button>
 
         <button class="gen-submit" id="gen-submit">Сгенерировать</button>
 
@@ -1040,14 +1044,14 @@ genTools.addEventListener('click', function(e) {
   label.classList.toggle('active', cb.checked);
 });
 
-// Card product — select all tools
-document.getElementById('gen-select-all')?.addEventListener('click', function() {
+// Card product — select all tools and generate
+document.getElementById('gen-submit-card')?.addEventListener('click', function() {
   genTools.querySelectorAll('.gen-checkbox').forEach(el => {
     const cb = el.querySelector('input[type="checkbox"]');
     cb.checked = true;
     el.classList.add('active');
   });
-  showToast('Все инструменты выбраны — будет сгенерирована полная карточка товара', 'success');
+  handleGenerate();
 });
 
 // Generate
