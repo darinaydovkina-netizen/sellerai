@@ -1,7 +1,9 @@
 import json
 import logging
+import re
 
 import httpx
+from httpx import HTTPStatusError, RequestError
 
 from config import settings
 
@@ -29,6 +31,13 @@ FIELDS_MAP = {
     "competitors": "competitor_analysis",
     "ad": "ad_text",
 }
+
+
+def _clean_json(raw: str) -> str:
+    raw = raw.strip()
+    raw = re.sub(r"^```(?:json)?\s*", "", raw)
+    raw = re.sub(r"\s*```$", "", raw)
+    return raw.strip()
 
 
 async def generate_content(product: str, tools: list[str], marketplace: str) -> dict:
@@ -61,19 +70,28 @@ async def generate_content(product: str, tools: list[str], marketplace: str) -> 
 
     logger.info("Calling YandexGPT for product: %s", product)
 
-    async with httpx.AsyncClient(timeout=60) as client:
-        response = await client.post(YANDEX_API_URL, json=payload, headers=headers)
-        response.raise_for_status()
-        data = response.json()
+    try:
+        async with httpx.AsyncClient(timeout=120) as client:
+            response = await client.post(YANDEX_API_URL, json=payload, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+    except HTTPStatusError as e:
+        logger.error("YandexGPT HTTP error: %s - %s", e.response.status_code, e.response.text)
+        raise RuntimeError(f"YandexGPT API вернул ошибку {e.response.status_code}")
+    except RequestError as e:
+        logger.error("YandexGPT request failed: %s", e)
+        raise RuntimeError("Не удалось подключиться к YandexGPT API")
 
     logger.info("YandexGPT response received")
 
     raw = data["result"]["alternatives"][0]["message"]["text"]
+    cleaned = _clean_json(raw)
 
-    if raw.startswith("```"):
-        raw = raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-
-    result = json.loads(raw)
+    try:
+        result = json.loads(cleaned)
+    except json.JSONDecodeError as e:
+        logger.error("YandexGPT JSON parse error: %s | raw=%s", e, cleaned[:500])
+        raise RuntimeError("YandexGPT вернул невалидный JSON")
 
     requested_fields = set()
     for tool in tools:

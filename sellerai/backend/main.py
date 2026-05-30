@@ -314,7 +314,7 @@ async def generate(req: GenerateRequest, user=Depends(get_current_user)):
             result = await generate_content(req.product, req.tools, req.marketplace)
         except Exception as e:
             logger.error("Generation failed: %s", e)
-            raise HTTPException(status_code=500, detail="Ошибка генерации контента. Попробуйте позже.")
+            raise HTTPException(status_code=500, detail=str(e))
 
         gen = Generation(
             user_id=user_db.id,
