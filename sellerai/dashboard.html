@@ -628,6 +628,28 @@ async function loadDashboard() {
   }
 }
 
+async function loadProfile() {
+  try {
+    const me = await apiRequest('GET', '/me');
+    if (!me) return;
+    state.user = me;
+
+    const used = me.generations_used || 0;
+    const limit = me.generations_limit || 0;
+    showScreen('profile');
+    profileEmail.textContent = me.email || '—';
+    const tariffNames = { starter: 'Starter', business: 'Business', pro: 'Pro' };
+    profileTariff.textContent = tariffNames[me.tariff] || me.tariff || '—';
+    const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
+    profileProgress.style.width = pct + '%';
+    profileUsed.textContent = used;
+    profileLimit.textContent = limit;
+    document.querySelectorAll('.tariff-card').forEach(c => c.classList.toggle('active', c.dataset.tariff === me.tariff));
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
 async function loadHistory() {
   try {
     const data = await apiRequest('GET', '/history');
@@ -848,7 +870,7 @@ sidebarNav.addEventListener('click', function(e) {
   showScreen(btn.dataset.screen);
   closeSidebar();
   if (btn.dataset.screen === 'history') loadHistory();
-  if (btn.dataset.screen === 'profile') loadDashboard();
+  if (btn.dataset.screen === 'profile') loadProfile();
 });
 
 // Burger menu
