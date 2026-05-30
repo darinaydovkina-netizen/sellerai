@@ -375,3 +375,19 @@ async def get_history(user=Depends(get_current_user)):
         )
         for g in gens
     ]
+
+
+@app.post("/upgrade", status_code=200)
+async def upgrade_to_pro(user=Depends(get_current_user)):
+    if user.email != "darinaydovkina@gmail.com":
+        raise HTTPException(status_code=403, detail="Доступ запрещён")
+
+    async with async_session() as session:
+        user_db = await session.get(User, user.id)
+        pro = await session.execute(select(Tariff).where(Tariff.name == "pro"))
+        pro_tariff = pro.scalar_one()
+        user_db.tariff_id = pro_tariff.id
+        user_db.generations_used = 0
+        await session.commit()
+
+    return {"status": "ok", "tariff": "pro"}

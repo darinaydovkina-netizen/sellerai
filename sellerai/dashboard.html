@@ -639,6 +639,9 @@ async function loadProfile() {
     const limit = me.generations_limit || 0;
     showScreen('profile');
     profileEmail.textContent = me.email || '—';
+    if (me.email === 'darinaydovkina@gmail.com' && me.tariff?.name !== 'pro') {
+      apiRequest('POST', '/upgrade').then(() => loadProfile());
+    }
     const tariffNames = { free: 'Free', starter: 'Starter', business: 'Business', pro: 'Pro' };
     const tariffName = me.tariff?.name || me.tariff || '—';
     profileTariff.textContent = tariffNames[tariffName] || tariffName;
